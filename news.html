@@ -8,27 +8,39 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            margin: 0;
             padding: 20px;
+            background-color: #f0f0f0;
+        }
+        #app {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         h1 {
             text-align: center;
+            color: #333;
+        }
+        .bracket {
+            display: flex;
+            justify-content: space-around;
+        }
+        .round {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
         }
         .match {
+            background-color: #fff;
             border: 1px solid #ddd;
+            border-radius: 5px;
             padding: 10px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin: 10px 0;
+            width: 200px;
         }
         .team {
-            width: 40%;
-        }
-        .score {
-            width: 10%;
-            text-align: center;
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
         }
         input {
             width: 30px;
@@ -36,27 +48,44 @@
         }
         select {
             width: 100%;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
     <div id="app">
         <h1>유로 2024 16강 대진표</h1>
-        <div v-for="(match, index) in matches" :key="index" class="match">
-            <div class="team">
-                {{ match.team1 }}
-                <input v-model.number="match.score1" type="number" min="0">
+        <svg width="1200" height="600">
+            <!-- 선 그리기 -->
+            <g v-for="(round, roundIndex) in [8, 4, 2, 1]" :key="roundIndex">
+                <line v-for="(_, matchIndex) in Array(round)"
+                    :key="matchIndex"
+                    :x1="240 * roundIndex"
+                    :y1="600 / (round * 2) * (matchIndex * 2 + 1)"
+                    :x2="240 * (roundIndex + 1)"
+                    :y2="600 / (round * 2) * (Math.floor(matchIndex / 2) * 4 + 2)"
+                    stroke="#888" stroke-width="2"/>
+            </g>
+        </svg>
+        <div class="bracket">
+            <div class="round" v-for="(round, roundIndex) in [8, 4, 2, 1]" :key="roundIndex">
+                <div class="match" v-for="(match, matchIndex) in matches.slice(0, round)" :key="matchIndex"
+                     :style="{ marginTop: `${600 / (round * 2) * (matchIndex * 2) - 30}px` }">
+                    <div class="team">
+                        <span>{{ match.team1 }}</span>
+                        <input v-model.number="match.score1" type="number" min="0">
+                    </div>
+                    <div class="team">
+                        <span>{{ match.team2 }}</span>
+                        <input v-model.number="match.score2" type="number" min="0">
+                    </div>
+                    <select v-model="match.winner">
+                        <option value="">승자 선택</option>
+                        <option :value="match.team1">{{ match.team1 }}</option>
+                        <option :value="match.team2">{{ match.team2 }}</option>
+                    </select>
+                </div>
             </div>
-            <div class="score">vs</div>
-            <div class="team">
-                <input v-model.number="match.score2" type="number" min="0">
-                {{ match.team2 }}
-            </div>
-            <select v-model="match.winner">
-                <option value="">승자 선택</option>
-                <option :value="match.team1">{{ match.team1 }}</option>
-                <option :value="match.team2">{{ match.team2 }}</option>
-            </select>
         </div>
     </div>
 
@@ -72,7 +101,9 @@
                     { team1: '이탈리아', team2: '오스트리아', score1: null, score2: null, winner: '' },
                     { team1: '덴마크', team2: '스위스', score1: null, score2: null, winner: '' },
                     { team1: '폴란드', team2: '스웨덴', score1: null, score2: null, winner: '' },
-                    { team1: '우크라이나', team2: '터키', score1: null, score2: null, winner: '' }
+                    { team1: '우크라이나', team2: '터키', score1: null, score2: null, winner: '' },
+                    // 8강, 4강, 결승을 위한 빈 매치 추가
+                    ...Array(7).fill().map(() => ({ team1: '', team2: '', score1: null, score2: null, winner: '' }))
                 ]
             }
         });
