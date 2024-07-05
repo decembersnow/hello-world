@@ -54,13 +54,33 @@
             cursor: pointer;
             border-radius: 5px;
         }
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        select {
+            padding: 5px;
+            font-size: 16px;
+            margin: 0 5px;
+        }
     </style>
 </head>
 <body>
     <div id="app">
-        <h1>{{ currentYear }}년 {{ currentMonth + 1 }}월</h1>
-        <button @click="previousMonth" class="nav-button">&lt; 이전</button>
-        <button @click="nextMonth" class="nav-button">다음 &gt;</button>
+        <div class="nav-container">
+            <button @click="previousMonth" class="nav-button">&lt; 이전</button>
+            <div>
+                <select v-model="selectedYear" @change="updateDate">
+                    <option v-for="year in yearRange" :key="year" :value="year">{{ year }}년</option>
+                </select>
+                <select v-model="selectedMonth" @change="updateDate">
+                    <option v-for="month in 12" :key="month" :value="month - 1">{{ month }}월</option>
+                </select>
+            </div>
+            <button @click="nextMonth" class="nav-button">다음 &gt;</button>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -83,18 +103,18 @@
             el: '#app',
             data: {
                 currentDate: new Date(),
-                weekdays: ['일', '월', '화', '수', '목', '금', '토']
+                weekdays: ['일', '월', '화', '수', '목', '금', '토'],
+                selectedYear: new Date().getFullYear(),
+                selectedMonth: new Date().getMonth()
             },
             computed: {
-                currentYear() {
-                    return this.currentDate.getFullYear();
-                },
-                currentMonth() {
-                    return this.currentDate.getMonth();
+                yearRange() {
+                    const currentYear = new Date().getFullYear();
+                    return Array.from({length: 21}, (_, i) => currentYear - 10 + i);
                 },
                 calendar() {
-                    const startDay = new Date(this.currentYear, this.currentMonth, 1).getDay();
-                    const endDate = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+                    const startDay = new Date(this.selectedYear, this.selectedMonth, 1).getDay();
+                    const endDate = new Date(this.selectedYear, this.selectedMonth + 1, 0).getDate();
                     
                     let date = 1;
                     let calendar = [];
@@ -103,7 +123,7 @@
                         let week = [];
                         for (let j = 0; j < 7; j++) {
                             if (i === 0 && j < startDay) {
-                                const prevMonthEnd = new Date(this.currentYear, this.currentMonth, 0).getDate();
+                                const prevMonthEnd = new Date(this.selectedYear, this.selectedMonth, 0).getDate();
                                 week.push({
                                     date: prevMonthEnd - startDay + j + 1,
                                     isOtherMonth: true,
@@ -119,8 +139,8 @@
                             } else {
                                 const today = new Date();
                                 const isToday = date === today.getDate() && 
-                                                this.currentMonth === today.getMonth() && 
-                                                this.currentYear === today.getFullYear();
+                                                this.selectedMonth === today.getMonth() && 
+                                                this.selectedYear === today.getFullYear();
                                 week.push({
                                     date: date,
                                     isOtherMonth: false,
@@ -137,10 +157,23 @@
             },
             methods: {
                 previousMonth() {
-                    this.currentDate = new Date(this.currentYear, this.currentMonth - 1, 1);
+                    if (this.selectedMonth === 0) {
+                        this.selectedYear--;
+                        this.selectedMonth = 11;
+                    } else {
+                        this.selectedMonth--;
+                    }
                 },
                 nextMonth() {
-                    this.currentDate = new Date(this.currentYear, this.currentMonth + 1, 1);
+                    if (this.selectedMonth === 11) {
+                        this.selectedYear++;
+                        this.selectedMonth = 0;
+                    } else {
+                        this.selectedMonth++;
+                    }
+                },
+                updateDate() {
+                    this.currentDate = new Date(this.selectedYear, this.selectedMonth);
                 }
             }
         });
