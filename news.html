@@ -74,9 +74,10 @@
             methods: {
                 search() {
                     const API_KEY = '9cce0e8d5596405682a19a67491e6cb9'; // NewsAPI에서 받은 API 키를 여기에 입력하세요
-                    const url = `https://newsapi.org/v2/everything?q=${this.searchQuery}&from=${this.getDateString(1)}&to=${this.getDateString()}&sortBy=publishedAt&apiKey=${API_KEY}`;
-
-                    axios.get(url)
+                    const newsApiUrl = `https://newsapi.org/v2/everything?q=${this.searchQuery}&from=${this.getDateString(1)}&to=${this.getDateString()}&sortBy=publishedAt&apiKey=${API_KEY}`;
+                    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                    
+                    axios.get(proxyUrl + newsApiUrl)
                         .then(response => {
                             this.articles = response.data.articles;
                             this.error = '';
