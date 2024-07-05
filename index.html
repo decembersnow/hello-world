@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>세련된 월별 캘린더</title>
+    <title>HTML5 샘플</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -14,203 +14,65 @@
             height: 100vh;
             margin: 0;
         }
-        .calendar-container {
+        .container {
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            overflow: hidden;
-            width: 350px;
-        }
-        .calendar-header {
-            background-color: #3498db;
-            color: white;
             padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
             text-align: center;
-            font-size: 24px;
-        }
-        .calendar-body {
-            padding: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            text-align: center;
-            padding: 10px;
-        }
-        th {
-            background-color: #f2f2f2;
             color: #333;
         }
-        td {
-            color: #666;
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
         }
-        .today {
-            background-color: #3498db;
-            color: white;
-            border-radius: 50%;
-        }
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .arrow {
-            background-color: #3498db;
-            color: white;
+        .button {
+            background-color: #4CAF50;
             border: none;
-            padding: 5px 10px;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
             font-size: 16px;
+            margin: 4px 2px;
             cursor: pointer;
             border-radius: 5px;
+            transition: background-color 0.3s;
         }
-        .arrow:hover {
-            background-color: #2980b9;
+        .button:hover {
+            background-color: #45a049;
         }
-        #currentYearMonth {
-            font-size: 18px;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
+        @media (max-width: 600px) {
+            .button-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
-        #yearSelect {
-            padding: 5px;
-            font-size: 16px;
-            border: none;
-            background-color: transparent;
-            font-weight: bold;
-            cursor: pointer;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-        }
-        #yearSelect::-ms-expand {
-            display: none;
-        }
-        #monthSpan {
-            margin-left: 5px;
-        }
-        /* 추가된 스타일 */
-        #yearSelect option {
-            font-size: 16px;
+        @media (max-width: 400px) {
+            .button-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="calendar-container">
-        <div class="calendar-header">
-            <span id="currentDate"></span>
-        </div>
-        <div class="calendar-body">
-            <div class="controls">
-                <button class="arrow" onclick="changeMonth(-1)">&lt;</button>
-                <span id="currentYearMonth">
-                    <select id="yearSelect" onchange="selectYear(this.value)"></select>
-                    <span id="monthSpan"></span>
-                </span>
-                <button class="arrow" onclick="changeMonth(1)">&gt;</button>
-            </div>
-            <table id="calendarTable">
-                <tr>
-                    <th>일</th>
-                    <th>월</th>
-                    <th>화</th>
-                    <th>수</th>
-                    <th>목</th>
-                    <th>금</th>
-                    <th>토</th>
-                </tr>
-            </table>
+    <div class="container">
+        <h1>HTML5 샘플</h1>
+        <div class="button-grid">
+            <a href="calendar.html" class="button">캘린더</a>
+            <a href="#" class="button">버튼 2</a>
+            <a href="#" class="button">버튼 3</a>
+            <a href="#" class="button">버튼 4</a>
+            <a href="#" class="button">버튼 5</a>
+            <a href="#" class="button">버튼 6</a>
+            <a href="#" class="button">버튼 7</a>
+            <a href="#" class="button">버튼 8</a>
+            <a href="#" class="button">버튼 9</a>
         </div>
     </div>
-
-    <script>
-        const currentDate = document.getElementById('currentDate');
-        const yearSelect = document.getElementById('yearSelect');
-        const monthSpan = document.getElementById('monthSpan');
-        const calendarTable = document.getElementById('calendarTable');
-
-        const months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
-        let currentYear = new Date().getFullYear();
-        let currentMonth = new Date().getMonth();
-
-        function initializeYearSelect() {
-            const currentYear = new Date().getFullYear();
-            for (let year = currentYear - 50; year <= currentYear + 50; year++) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.textContent = year + '년';
-                yearSelect.appendChild(option);
-            }
-            yearSelect.value = currentYear;
-        }
-
-        function updateCalendar() {
-            currentDate.textContent = `${currentYear}년 ${months[currentMonth]}`;
-            yearSelect.value = currentYear;
-            monthSpan.textContent = `${months[currentMonth]}`;
-
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-
-            let date = 1;
-            let tableHTML = calendarTable.rows[0].outerHTML;
-
-            for (let i = 0; i < 6; i++) {
-                let row = '<tr>';
-                for (let j = 0; j < 7; j++) {
-                    if (i === 0 && j < firstDay.getDay()) {
-                        row += '<td></td>';
-                    } else if (date > lastDay.getDate()) {
-                        row += '<td></td>';
-                    } else {
-                        const today = new Date();
-                        const isToday = date === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-                        row += `<td class="${isToday ? 'today' : ''}">${date}</td>`;
-                        date++;
-                    }
-                }
-                row += '</tr>';
-                tableHTML += row;
-                if (date > lastDay.getDate()) break;
-            }
-
-            calendarTable.innerHTML = tableHTML;
-        }
-
-        function changeMonth(delta) {
-            currentMonth += delta;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            } else if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            yearSelect.value = currentYear;
-            updateCalendar();
-        }
-
-        function selectYear(year) {
-            currentYear = parseInt(year);
-            updateCalendar();
-        }
-
-        initializeYearSelect();
-        updateCalendar();
-
-        // 추가된 코드: 년도 선택 시 스크롤 위치 조정
-        yearSelect.addEventListener('focus', function() {
-            setTimeout(() => {
-                const selectedOption = this.options[this.selectedIndex];
-                selectedOption.scrollIntoView({
-                    block: 'center',
-                    inline: 'nearest'
-                });
-            }, 0);
-        });
-    </script>
 </body>
 </html>
