@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>뉴스 검색</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        h3 {
+            margin-bottom: 5px;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>뉴스 검색</h1>
+        <input type="text" v-model="searchQuery" placeholder="검색어를 입력하세요">
+        <button @click="search">찾기</button>
+        <div v-if="articles.length > 0">
+            <h2>검색 결과</h2>
+            <ul>
+                <li v-for="(article, index) in articles" :key="index">
+                    <h3>{{ article.title }}</h3>
+                    <p>{{ article.description }}</p>
+                    <small>{{ new Date(article.publishedAt).toLocaleDateString() }}</small>
+                </li>
+            </ul>
+        </div>
+        <div v-if="error">
+            <p>{{ error }}</p>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                searchQuery: '',
+                articles: [],
+                error: ''
+            },
+            methods: {
+                search() {
+                    const API_KEY = 'YOUR_API_KEY_HERE'; // NewsAPI에서 받은 API 키를 여기에 입력하세요
+                    const url = `https://newsapi.org/v2/everything?q=${this.searchQuery}&from=${this.getDateString(1)}&to=${this.getDateString()}&sortBy=publishedAt&apiKey=${API_KEY}`;
+
+                    axios.get(url)
+                        .then(response => {
+                            this.articles = response.data.articles;
+                            this.error = '';
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            this.error = '검색 중 오류가 발생했습니다. 나중에 다시 시도해 주세요.';
+                        });
+                },
+                getDateString(daysAgo = 0) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - daysAgo);
+                    return date.toISOString().split('T')[0];
+                }
+            }
+        });
+    </script>
+</body>
+</html>
