@@ -149,6 +149,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script>
+        let tasks = {
+            todo: [],
+            inProgress: [],
+            done: []
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+            renderTasks();
+        });
+
         document.getElementById('addTaskBtn').addEventListener('click', function() {
             const todoColumn = document.getElementById('todo');
             const existingForm = todoColumn.querySelector('.new-task-form');
@@ -166,10 +177,9 @@
                 const newTaskInput = document.getElementById('newTask');
                 newTaskInput.focus();
                 
-                // 엔터 키 이벤트 리스너 추가
                 newTaskInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
-                        e.preventDefault(); // 폼 제출 방지
+                        e.preventDefault();
                         addNewTask();
                     }
                 });
@@ -180,83 +190,115 @@
             const task = document.getElementById('newTask').value;
             
             if (task) {
-                createTask(task);
+                const now = new Date();
+                const dateString = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+                tasks.todo.push({content: task, date: dateString});
+                saveTasks();
+                renderTasks();
                 document.querySelector('.new-task-form').remove();
             } else {
                 alert('할일을 입력해주세요.');
             }
         }
 
-        function createTask(task) {
-            const newTask = document.createElement('div');
-            newTask.className = 'task';
-            const now = new Date();
-            const dateString = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-            newTask.innerHTML = `
-                <div class="task-date">${dateString}</div>
-                <div class="task-content">${task}</div>
+        function createTaskElement(task, columnId, index) {
+            const taskElement = document.createElement('div');
+            taskElement.className = 'task';
+            taskElement.innerHTML = `
+                <div class="task-date">${task.date}</div>
+                <div class="task-content">${task.content}</div>
                 <div class="task-buttons">
-                    <button onclick="editTask(this)">수정</button>
-                    <button onclick="deleteTask(this)">삭제</button>
+                    <button onclick="editTask('${columnId}', ${index})">수정</button>
+                    <button onclick="deleteTask('${columnId}', ${index})">삭제</button>
                 </div>
             `;
-            
-            const todoColumn = document.getElementById('todo');
-            todoColumn.insertBefore(newTask, todoColumn.firstChild.nextSibling);
+            return taskElement;
         }
 
-        function editTask(button) {
-            const task = button.closest('.task');
-            const taskContent = task.querySelector('.task-content').textContent;
-            const taskDate = task.querySelector('.task-date').textContent;
-
-            task.innerHTML = `
-                <div class="task-date">${taskDate}</div>
-                <input type="text" value="${taskContent}" class="edit-task" style="width: calc(100% - 22px); padding: 10px; margin-bottom: 10px;">
-                <button onclick="saveTask(this)">저장</button>
+        function editTask(columnId, index) {
+            const task = tasks[columnId][index];
+            const taskElement = document.querySelector(`#${columnId} .task:nth-child(${index + 2})`);
+            
+            taskElement.innerHTML = `
+                <div class="task-date">${task.date}</div>
+                <input type="text" value="${task.content}" class="edit-task" style="width: calc(100% - 22px); padding: 10px; margin-bottom: 10px;">
+                <button onclick="saveTask('${columnId}', ${index})">저장</button>
             `;
-            const editInput = task.querySelector('.edit-task');
+            const editInput = taskElement.querySelector('.edit-task');
             editInput.focus();
             
-            // 수정 시에도 엔터 키 이벤트 리스너 추가
             editInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter') {
-                    e.preventDefault(); // 폼 제출 방지
-                    saveTask(this);
+                    e.preventDefault();
+                    saveTask(columnId, index);
                 }
             });
         }
 
-        function saveTask(element) {
-            const task = element.closest('.task');
-            const newTaskContent = task.querySelector('.edit-task').value;
-            const taskDate = task.querySelector('.task-date').textContent;
-
-            task.innerHTML = `
-                <div class="task-date">${taskDate}</div>
-                <div class="task-content">${newTaskContent}</div>
-                <div class="task-buttons">
-                    <button onclick="editTask(this)">수정</button>
-                    <button onclick="deleteTask(this)">삭제</button>
-                </div>
-            `;
+        function saveTask(columnId, index) {
+            const taskElement = document.querySelector(`#${columnId} .task:nth-child(${index + 2})`);
+            const newTaskContent = taskElement.querySelector('.edit-task').value;
+            
+            tasks[columnId][index].content = newTaskContent;
+            saveTasks();
+            renderTasks();
         }
 
-        function deleteTask(button) {
+        function deleteTask(columnId, index) {
             if (confirm('이 할일을 삭제하시겠습니까?')) {
-                button.closest('.task').remove();
+                tasks[columnId].splice(index, 1);
+                saveTasks();
+                renderTasks();
             }
         }
 
-        // 드래그 앤 드롭 기능 구현
-        const columns = document.querySelectorAll('.column');
-        columns.forEach(column => {
-            new Sortable(column, {
-                group: 'shared',
-                animation: 150,
-                ghostClass: 'blue-background-class'
+        function renderTasks() {
+            ['todo', 'inProgress', 'done'].forEach(columnId => {
+                const column = document.getElementById(columnId);
+                column.innerHTML = `<h2>${column.querySelector('h2').textContent}</h2>`;
+                tasks[columnId].forEach((task, index) => {
+                    column.appendChild(createTaskElement(task, columnId, index));
+                });
             });
-        });
+            setupDragAndDrop();
+        }
+
+        function saveTasks() {
+            localStorage.setItem('kanbanTasks', JSON.stringify(tasks));
+        }
+
+        function loadTasks() {
+            const savedTasks = localStorage.getItem('kanbanTasks');
+            if (savedTasks) {
+                tasks = JSON.parse(savedTasks);
+            }
+        }
+
+        function setupDragAndDrop() {
+            const columns = document.querySelectorAll('.column');
+            columns.forEach(column => {
+                new Sortable(column, {
+                    group: 'shared',
+                    animation: 150,
+                    ghostClass: 'blue-background-class',
+                    onEnd: function (evt) {
+                        const itemEl = evt.item;
+                        const toColumnId = itemEl.parentElement.id;
+                        const fromColumnId = evt.from.id;
+                        const oldIndex = evt.oldIndex - 1;  // Subtract 1 to account for the h2 element
+                        const newIndex = evt.newIndex - 1;  // Subtract 1 to account for the h2 element
+
+                        if (fromColumnId !== toColumnId || oldIndex !== newIndex) {
+                            const movedTask = tasks[fromColumnId].splice(oldIndex, 1)[0];
+                            tasks[toColumnId].splice(newIndex, 0, movedTask);
+                            saveTasks();
+                            renderTasks();
+                        }
+                    }
+                });
+            });
+        }
+
     </script>
 </body>
 </html>
