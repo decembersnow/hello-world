@@ -3,97 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>칸반 보드</title>
+    <title>칸반보드 업무 관리</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f5f7;
+        }
+        h1 {
+            text-align: center;
+            color: #172b4d;
+        }
         .board {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-around;
+            margin-top: 20px;
         }
-        .group {
-            flex: 1;
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
+        .column {
+            background-color: #ebecf0;
             border-radius: 5px;
-            background-color: #f9f9f9;
+            width: 30%;
+            padding: 10px;
+            min-height: 300px;
+        }
+        .column h2 {
+            text-align: center;
+            color: #172b4d;
         }
         .task {
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #dfe1e6;
+            background-color: white;
             border-radius: 3px;
-            background-color: #f4f5f7;
+            padding: 10px;
+            margin-bottom: 10px;
             box-shadow: 0 1px 0 rgba(9,30,66,.25);
-            cursor: pointer;
             position: relative;
+            cursor: move;
         }
-        .task:hover {
-            background-color: #ebecf0;
+        .task h3 {
+            margin: 0 0 5px 0;
+            font-size: 14px;
         }
-        .task .actions {
+        .task p {
+            margin: 0;
+            font-size: 12px;
+            color: #5e6c84;
+        }
+        #addTaskBtn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #0052cc;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #addTaskBtn:hover {
+            background-color: #0065ff;
+        }
+        .new-task-form {
+            background-color: white;
+            border-radius: 3px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .new-task-form input, .new-task-form textarea {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 5px;
+        }
+        .new-task-form button {
+            background-color: #0052cc;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .task-buttons {
             display: none;
             position: absolute;
-            right: 5px;
             top: 5px;
+            right: 5px;
         }
-        .task:hover .actions {
-            display: flex;
-            justify-content: space-between;
+        .task:hover .task-buttons {
+            display: block;
+        }
+        .task-buttons button {
+            background-color: #0052cc;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            margin-left: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
+    <h1>칸반보드 업무 관리</h1>
+    <button id="addTaskBtn">작업 추가</button>
     <div class="board">
-        <div class="group" id="todo-group">
-            <h2>할일</h2>
-            <button id="add-todo">할일 입력</button>
+        <div class="column" id="todo">
+            <h2>할 일</h2>
         </div>
-        <div class="group" id="in-progress-group">
-            <h2>진행중</h2>
+        <div class="column" id="inProgress">
+            <h2>진행 중</h2>
         </div>
-        <div class="group" id="done-group">
+        <div class="column" id="done">
             <h2>완료</h2>
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.14.0/Sortable.min.js"></script>
     <script>
-        document.getElementById('add-todo').addEventListener('click', function() {
-            var task = document.createElement('div');
-            task.className = 'task';
-            task.innerHTML = '<div class="actions"><button class="edit-task">수정</button><button class="delete-task">삭제</button></div>';
-            var taskInput = document.createElement('input');
-            taskInput.type = 'text';
-            taskInput.placeholder = '할일을 입력하세요';
-            task.appendChild(taskInput);
-            taskInput.disabled = false; // Enable input field for the initial task creation
-            task.setAttribute('draggable', 'true');
-            task.addEventListener('dragstart', function(e) {
-                e.dataTransfer.setData('text/plain', 'task');
-            });
-            this.parentNode.insertBefore(task, this);
+        document.getElementById('addTaskBtn').addEventListener('click', function() {
+            const todoColumn = document.getElementById('todo');
+            const newTaskForm = document.createElement('div');
+            newTaskForm.className = 'new-task-form';
+            newTaskForm.innerHTML = `
+                <input type="text" placeholder="작업 제목" id="newTaskTitle">
+                <textarea placeholder="작업 설명" id="newTaskDescription"></textarea>
+                <button onclick="addNewTask()">추가</button>
+            `;
+            todoColumn.insertBefore(newTaskForm, todoColumn.firstChild.nextSibling);
         });
 
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('edit-task')) {
-                var taskInput = e.target.parentNode.parentNode.querySelector('input');
-                taskInput.disabled = false; // Enable input field for editing
-                var newText = prompt('할일을 수정하세요', taskInput.value);
-                if (newText) taskInput.value = newText;
-                taskInput.disabled = true; // Disable input field after editing
-            } else if (e.target.classList.contains('delete-task')) {
-                e.target.parentNode.parentNode.remove();
+        function addNewTask() {
+            const title = document.getElementById('newTaskTitle').value;
+            const description = document.getElementById('newTaskDescription').value;
+            
+            if (title && description) {
+                createTask(title, description);
+                document.querySelector('.new-task-form').remove();
+            } else {
+                alert('제목과 설명을 모두 입력해주세요.');
             }
-        });
+        }
 
-        // Add event listener for 'keydown' to detect Enter key press for task input completion
-        var taskInputs = document.querySelectorAll('input');
-        taskInputs.forEach(function(taskInput) {
-            taskInput.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
-                    taskInput.disabled = true; // Disable input field after task input completion
-                    taskInput.parentNode.removeChild(taskInput); // Remove the input field
-                    taskInput.parentNode.textContent = taskInput.value; // Set task box text to the input value
-                }
+        function createTask(title, description) {
+            const newTask = document.createElement('div');
+            newTask.className = 'task';
+            newTask.innerHTML = `
+                <h3>${title}</h3>
+                <p>${description}</p>
+                <div class="task-buttons">
+                    <button onclick="editTask(this)">수정</button>
+                    <button onclick="deleteTask(this)">삭제</button>
+                </div>
+            `;
+            
+            const todoColumn = document.getElementById('todo');
+            todoColumn.insertBefore(newTask, todoColumn.firstChild.nextSibling);
+        }
+
+        function editTask(button) {
+            const task = button.closest('.task');
+            const title = task.querySelector('h3').textContent;
+            const description = task.querySelector('p').textContent;
+
+            task.innerHTML = `
+                <input type="text" value="${title}" class="edit-title">
+                <textarea class="edit-description">${description}</textarea>
+                <button onclick="saveTask(this)">저장</button>
+            `;
+        }
+
+        function saveTask(button) {
+            const task = button.closest('.task');
+            const newTitle = task.querySelector('.edit-title').value;
+            const newDescription = task.querySelector('.edit-description').value;
+
+            task.innerHTML = `
+                <h3>${newTitle}</h3>
+                <p>${newDescription}</p>
+                <div class="task-buttons">
+                    <button onclick="editTask(this)">수정</button>
+                    <button onclick="deleteTask(this)">삭제</button>
+                </div>
+            `;
+        }
+
+        function deleteTask(button) {
+            if (confirm('이 작업을 삭제하시겠습니까?')) {
+                button.closest('.task').remove();
+            }
+        }
+
+        // 드래그 앤 드롭 기능 구현
+        const columns = document.querySelectorAll('.column');
+        columns.forEach(column => {
+            new Sortable(column, {
+                group: 'shared',
+                animation: 150,
+                ghostClass: 'blue-background-class'
             });
         });
     </script>
