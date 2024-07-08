@@ -65,7 +65,7 @@
             taskInput.type = 'text';
             taskInput.placeholder = '할일을 입력하세요';
             task.appendChild(taskInput);
-            taskInput.disabled = true;
+            taskInput.disabled = false; // Enable input field for the initial task creation
             task.setAttribute('draggable', 'true');
             task.addEventListener('dragstart', function(e) {
                 e.dataTransfer.setData('text/plain', 'task');
@@ -76,10 +76,10 @@
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('edit-task')) {
                 var taskInput = e.target.parentNode.parentNode.querySelector('input');
-                taskInput.disabled = false;
+                taskInput.disabled = false; // Enable input field for editing
                 var newText = prompt('할일을 수정하세요', taskInput.value);
                 if (newText) taskInput.value = newText;
-                taskInput.disabled = true;
+                taskInput.disabled = true; // Disable input field after editing
             } else if (e.target.classList.contains('delete-task')) {
                 e.target.parentNode.parentNode.remove();
             }
