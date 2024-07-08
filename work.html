@@ -163,14 +163,16 @@
                     <button onclick="addNewTask()">추가</button>
                 `;
                 todoColumn.insertBefore(newTaskForm, todoColumn.firstChild.nextSibling);
-                document.getElementById('newTask').focus();
-            }
-        });
-
-        // Add event listener for pressing Enter key to add a new task
-        document.getElementById('newTask').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addNewTask();
+                const newTaskInput = document.getElementById('newTask');
+                newTaskInput.focus();
+                
+                // 엔터 키 이벤트 리스너 추가
+                newTaskInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // 폼 제출 방지
+                        addNewTask();
+                    }
+                });
             }
         });
 
@@ -213,11 +215,20 @@
                 <input type="text" value="${taskContent}" class="edit-task" style="width: calc(100% - 22px); padding: 10px; margin-bottom: 10px;">
                 <button onclick="saveTask(this)">저장</button>
             `;
-            task.querySelector('.edit-task').focus();
+            const editInput = task.querySelector('.edit-task');
+            editInput.focus();
+            
+            // 수정 시에도 엔터 키 이벤트 리스너 추가
+            editInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // 폼 제출 방지
+                    saveTask(this);
+                }
+            });
         }
 
-        function saveTask(button) {
-            const task = button.closest('.task');
+        function saveTask(element) {
+            const task = element.closest('.task');
             const newTaskContent = task.querySelector('.edit-task').value;
             const taskDate = task.querySelector('.task-date').textContent;
 
