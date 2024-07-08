@@ -46,6 +46,7 @@
             border: none;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            border-radius: 8px; /* Add border-radius property */
         }
         button:hover {
             background-color: #2980b9;
@@ -113,7 +114,7 @@
     <div id="select-all-container">
         <input type="checkbox" id="select-all">
         <label for="select-all">전체 선택</label>
-        <button id="delete-selected">선택 삭제</button>
+        <button id="delete-selected">완료 Task 삭제</button> <!-- Change button text to '완료 Task 삭제' -->
     </div>
     <form id="todo-form">
         <input type="text" id="todo-input" placeholder="할 일을 입력하세요" required>
