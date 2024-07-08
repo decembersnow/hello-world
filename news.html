@@ -3,110 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>유로 2024 16강 대진표</title>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <title>뉴스 링크 모음</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
+            font-family: 'Arial', sans-serif;
             background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        #app {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1 {
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             text-align: center;
-            color: #333;
         }
-        .bracket {
-            display: flex;
-            justify-content: space-around;
-        }
-        .round {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-        }
-        .match {
-            background-color: #fff;
-            border: 1px solid #ddd;
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 10px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
             border-radius: 5px;
-            padding: 10px;
-            margin: 10px 0;
-            width: 200px;
         }
-        .team {
-            display: flex;
-            justify-content: space-between;
-            margin: 5px 0;
-        }
-        input {
-            width: 30px;
-            text-align: center;
-        }
-        select {
-            width: 100%;
-            margin-top: 5px;
+        .btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <h1>유로 2024 16강 대진표</h1>
-        <svg width="1200" height="600">
-            <!-- 선 그리기 -->
-            <g v-for="(round, roundIndex) in [8, 4, 2, 1]" :key="roundIndex">
-                <line v-for="(_, matchIndex) in Array(round)"
-                    :key="matchIndex"
-                    :x1="240 * roundIndex"
-                    :y1="600 / (round * 2) * (matchIndex * 2 + 1)"
-                    :x2="240 * (roundIndex + 1)"
-                    :y2="600 / (round * 2) * (Math.floor(matchIndex / 2) * 4 + 2)"
-                    stroke="#888" stroke-width="2"/>
-            </g>
-        </svg>
-        <div class="bracket">
-            <div class="round" v-for="(round, roundIndex) in [8, 4, 2, 1]" :key="roundIndex">
-                <div class="match" v-for="(match, matchIndex) in matches.slice(0, round)" :key="matchIndex"
-                     :style="{ marginTop: `${600 / (round * 2) * (matchIndex * 2) - 30}px` }">
-                    <div class="team">
-                        <span>{{ match.team1 }}</span>
-                        <input v-model.number="match.score1" type="number" min="0">
-                    </div>
-                    <div class="team">
-                        <span>{{ match.team2 }}</span>
-                        <input v-model.number="match.score2" type="number" min="0">
-                    </div>
-                    <select v-model="match.winner">
-                        <option value="">승자 선택</option>
-                        <option :value="match.team1">{{ match.team1 }}</option>
-                        <option :value="match.team2">{{ match.team2 }}</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+    <div class="container">
+        <h1>뉴스 링크 모음</h1>
+        <a href="https://www.naver.com" target="_blank" class="btn">네이버 뉴스</a>
+        <a href="https://www.daum.net" target="_blank" class="btn">다음 뉴스</a>
+        <a href="https://www.chosun.com" target="_blank" class="btn">조선일보</a>
+        <a href="https://www.joongang.co.kr" target="_blank" class="btn">중앙일보</a>
+        <a href="https://www.hani.co.kr" target="_blank" class="btn">한겨레</a>
+        <a href="https://www.khan.co.kr" target="_blank" class="btn">경향신문</a>
+        <a href="https://www.etnews.com" target="_blank" class="btn">전자신문</a>
     </div>
-
-    <script>
-        new Vue({
-            el: '#app',
-            data: {
-                matches: [
-                    { team1: '프랑스', team2: '네덜란드', score1: null, score2: null, winner: '' },
-                    { team1: '독일', team2: '스페인', score1: null, score2: null, winner: '' },
-                    { team1: '잉글랜드', team2: '크로아티아', score1: null, score2: null, winner: '' },
-                    { team1: '포르투갈', team2: '벨기에', score1: null, score2: null, winner: '' },
-                    { team1: '이탈리아', team2: '오스트리아', score1: null, score2: null, winner: '' },
-                    { team1: '덴마크', team2: '스위스', score1: null, score2: null, winner: '' },
-                    { team1: '폴란드', team2: '스웨덴', score1: null, score2: null, winner: '' },
-                    { team1: '우크라이나', team2: '터키', score1: null, score2: null, winner: '' },
-                    // 8강, 4강, 결승을 위한 빈 매치 추가
-                    ...Array(7).fill().map(() => ({ team1: '', team2: '', score1: null, score2: null, winner: '' }))
-                ]
-            }
-        });
-    </script>
 </body>
 </html>
