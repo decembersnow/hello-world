@@ -84,6 +84,18 @@
                 e.target.parentNode.parentNode.remove();
             }
         });
+
+        // Add event listener for 'keydown' to detect Enter key press for task input completion
+        var taskInputs = document.querySelectorAll('input');
+        taskInputs.forEach(function(taskInput) {
+            taskInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    taskInput.disabled = true; // Disable input field after task input completion
+                    taskInput.parentNode.removeChild(taskInput); // Remove the input field
+                    taskInput.parentNode.textContent = taskInput.value; // Set task box text to the input value
+                }
+            });
+        });
     </script>
 </body>
 </html>
