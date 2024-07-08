@@ -62,6 +62,10 @@
     <div class="kanban-board">
         <div class="kanban-column" id="todo-column" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h2>할 일</h2>
+            <form id="todo-form">
+                <input type="text" id="todo-input" placeholder="할 일을 입력하세요">
+                <button type="submit" onclick="createTodoCard(todoInput.value)">추가</button>
+            </form>
         </div>
         <div class="kanban-column" id="in-progress-column" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h2>진행 중</h2>
@@ -132,4 +136,3 @@
                 }
             });
         </script>
-
