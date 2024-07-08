@@ -87,4 +87,49 @@
     </script>
 </body>
 </html>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const todoInput = document.getElementById('todo-input');
+                const todoForm = document.getElementById('todo-form');
+                const todoList = document.getElementById('todo-list');
+
+                todoForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const todoText = todoInput.value.trim();
+                    if (todoText) {
+                        createTodoCard(todoText);
+                        todoInput.value = '';
+                    }
+                });
+
+                function createTodoCard(text) {
+                    const card = document.createElement('div');
+                    card.className = 'kanban-card';
+                    card.draggable = true;
+                    card.ondragstart = function(e) {
+                        e.dataTransfer.setData("text", e.target.id);
+                    };
+                    card.id = `card-${Date.now()}`;
+                    card.innerHTML = `
+                        <p>${text}</p>
+                        <div class="kanban-card-actions">
+                            <button class="edit-btn">수정</button>
+                            <button class="delete-btn">삭제</button>
+                        </div>
+                    `;
+                    todoList.appendChild(card);
+
+                    const editBtn = card.querySelector('.edit-btn');
+                    editBtn.addEventListener('click', function() {
+                        const newText = prompt('할 일을 수정하세요', card.querySelector('p').textContent);
+                        if (newText) card.querySelector('p').textContent = newText;
+                    });
+
+                    const deleteBtn = card.querySelector('.delete-btn');
+                    deleteBtn.addEventListener('click', function() {
+                        card.remove();
+                    });
+                }
+            });
+        </script>
 
