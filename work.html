@@ -167,6 +167,13 @@
             }
         });
 
+        // Add event listener for pressing Enter key to add a new task
+        document.getElementById('newTask').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addNewTask();
+            }
+        });
+
         function addNewTask() {
             const task = document.getElementById('newTask').value;
             
