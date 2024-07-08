@@ -3,136 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>칸반보드 기반 업무 관리</title>
+    <title>칸반 보드</title>
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f0f0;
+        .board {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            justify-content: space-between;
         }
-        .kanban-board {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 800px;
-        }
-        .kanban-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px;
+        .group {
+            flex: 1;
             margin: 10px;
-            background-color: #f2f2f2;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            width: 200px;
-        }
-        .kanban-card {
             padding: 10px;
-            margin: 5px;
-            background-color: white;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            cursor: move;
+            background-color: #f9f9f9;
         }
-        .kanban-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        .task {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
         }
-        .kanban-card-actions {
+        .task:hover {
+            background-color: #f0f0f0;
+        }
+        .task .actions {
             display: none;
-            position: absolute;
-            right: 10px;
-            top: 10px;
         }
-        .kanban-card:hover .kanban-card-actions {
-            display: block;
+        .task:hover .actions {
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
 <body>
-    <div class="kanban-board">
-        <div class="kanban-column" id="todo-column" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>할 일</h2>
-            <form id="todo-form">
-                <input type="text" id="todo-input" placeholder="할 일을 입력하세요">
-                <button type="submit" onclick="createTodoCard(todoInput.value)">추가</button>
-            </form>
+    <div class="board">
+        <div class="group" id="todo-group">
+            <h2>할일</h2>
+            <button id="add-todo">할일 입력</button>
         </div>
-        <div class="kanban-column" id="in-progress-column" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>진행 중</h2>
+        <div class="group" id="in-progress-group">
+            <h2>진행중</h2>
         </div>
-        <div class="kanban-column" id="done-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+        <div class="group" id="done-group">
             <h2>완료</h2>
         </div>
     </div>
+
     <script>
-        function allowDrop(event) {
-            event.preventDefault();
-        }
+        document.getElementById('add-todo').addEventListener('click', function() {
+            var task = document.createElement('div');
+            task.className = 'task';
+            task.innerHTML = '<div class="actions"><button class="edit-task">수정</button><button class="delete-task">삭제</button></div>';
+            this.parentNode.insertBefore(task, this);
+        });
 
-        function drag(event) {
-            event.dataTransfer.setData("text", event.target.id);
-        }
-
-        function drop(event) {
-            event.preventDefault();
-            var data = event.dataTransfer.getData("text");
-            event.target.appendChild(document.getElementById(data));
-        }
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('edit-task')) {
+                var newText = prompt('할일을 수정하세요', e.target.parentNode.parentNode.textContent);
+                if (newText) e.target.parentNode.parentNode.textContent = newText;
+            } else if (e.target.classList.contains('delete-task')) {
+                e.target.parentNode.parentNode.remove();
+            }
+        });
     </script>
 </body>
 </html>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const todoInput = document.getElementById('todo-input');
-                const todoForm = document.getElementById('todo-form');
-                const todoList = document.getElementById('todo-list');
-
-                todoForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const todoText = todoInput.value.trim();
-                    if (todoText) {
-                        createTodoCard(todoText);
-                        todoInput.value = '';
-                    }
-                });
-
-                function createTodoCard(text) {
-                    const card = document.createElement('div');
-                    card.className = 'kanban-card';
-                    card.draggable = true;
-                    card.ondragstart = function(e) {
-                        e.dataTransfer.setData("text", e.target.id);
-                    };
-                    card.id = `card-${Date.now()}`;
-                    card.innerHTML = `
-                        <p>${text}</p>
-                        <div class="kanban-card-actions">
-                            <button class="edit-btn">수정</button>
-                            <button class="delete-btn">삭제</button>
-                        </div>
-                    `;
-                    todoList.appendChild(card);
-
-                    const editBtn = card.querySelector('.edit-btn');
-                    editBtn.addEventListener('click', function() {
-                        const newText = prompt('할 일을 수정하세요', card.querySelector('p').textContent);
-                        if (newText) card.querySelector('p').textContent = newText;
-                    });
-
-                    const deleteBtn = card.querySelector('.delete-btn');
-                    deleteBtn.addEventListener('click', function() {
-                        card.remove();
-                    });
-                }
-            });
-        </script>
