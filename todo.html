@@ -107,6 +107,9 @@
             width: 18px;
             height: 18px;
         }
+        #delete-selected {
+            margin-left: auto;
+        }
     </style>
 </head>
 <body>
@@ -114,7 +117,7 @@
     <div id="select-all-container">
         <input type="checkbox" id="select-all">
         <label for="select-all">전체 선택</label>
-        <button id="delete-selected">완료 Task 삭제</button> <!-- Change button text to '완료 Task 삭제' -->
+        <button id="delete-selected">완료 Task 삭제</button>
     </div>
     <form id="todo-form">
         <input type="text" id="todo-input" placeholder="할 일을 입력하세요" required>
@@ -123,7 +126,6 @@
     <ul id="todo-list"></ul>
 
     <script>
-        // JavaScript 코드는 이전과 동일합니다.
         const todoForm = document.getElementById('todo-form');
         const todoInput = document.getElementById('todo-input');
         const todoList = document.getElementById('todo-list');
@@ -138,9 +140,10 @@
 
         function addTodo(text) {
             const li = document.createElement('li');
+            const today = new Date().toLocaleDateString('ko-KR');
             li.innerHTML = `
                 <input type="checkbox" class="todo-checkbox">
-                <span class="todo-text">${text}</span>
+                <span class="todo-text">${today} - ${text}</span>
                 <div class="todo-actions">
                     <button class="edit-btn">수정</button>
                     <button class="delete-btn">삭제</button>
