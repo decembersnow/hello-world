@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>칸반보드 기반 업무 관리</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .kanban-board {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 800px;
+        }
+        .kanban-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            margin: 10px;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 200px;
+        }
+        .kanban-card {
+            padding: 10px;
+            margin: 5px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            cursor: move;
+        }
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .kanban-card-actions {
+            display: none;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+        .kanban-card:hover .kanban-card-actions {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="kanban-board">
+        <div class="kanban-column" id="todo-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>할 일</h2>
+        </div>
+        <div class="kanban-column" id="in-progress-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>진행 중</h2>
+        </div>
+        <div class="kanban-column" id="done-column" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h2>완료</h2>
+        </div>
+    </div>
+    <script>
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+
+        function drag(event) {
+            event.dataTransfer.setData("text", event.target.id);
+        }
+
+        function drop(event) {
+            event.preventDefault();
+            var data = event.dataTransfer.getData("text");
+            event.target.appendChild(document.getElementById(data));
+        }
+    </script>
+</body>
+</html>
+
