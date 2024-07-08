@@ -61,9 +61,11 @@
             var task = document.createElement('div');
             task.className = 'task';
             task.innerHTML = '<div class="actions"><button class="edit-task">수정</button><button class="delete-task">삭제</button></div>';
-            task.appendChild(document.createElement('input'));
-            task.lastChild.type = 'text';
-            task.lastChild.placeholder = '할일을 입력하세요';
+            var taskInput = document.createElement('input');
+            taskInput.type = 'text';
+            taskInput.placeholder = '할일을 입력하세요';
+            task.appendChild(taskInput);
+            taskInput.disabled = true;
             task.setAttribute('draggable', 'true');
             task.addEventListener('dragstart', function(e) {
                 e.dataTransfer.setData('text/plain', 'task');
@@ -73,8 +75,11 @@
 
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('edit-task')) {
-                var newText = prompt('할일을 수정하세요', e.target.parentNode.parentNode.textContent);
-                if (newText) e.target.parentNode.parentNode.textContent = newText;
+                var taskInput = e.target.parentNode.parentNode.querySelector('input');
+                taskInput.disabled = false;
+                var newText = prompt('할일을 수정하세요', taskInput.value);
+                if (newText) taskInput.value = newText;
+                taskInput.disabled = true;
             } else if (e.target.classList.contains('delete-task')) {
                 e.target.parentNode.parentNode.remove();
             }
