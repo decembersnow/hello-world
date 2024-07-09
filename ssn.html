@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주민등록번호/외국인등록번호 유효성 검증</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        select, input, button { margin: 10px 0; padding: 5px; }
+        #result { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>주민등록번호/외국인등록번호 유효성 검증</h1>
+    <select id="idType">
+        <option value="resident">주민등록번호</option>
+        <option value="foreigner">외국인등록번호</option>
+    </select>
+    <br>
+    <input type="text" id="idNumber" placeholder="번호 입력 (예: 000000-0000000)">
+    <br>
+    <button onclick="validateId()">유효성 체크</button>
+    <div id="result"></div>
+
+    <script>
+        function validateId() {
+            const idType = document.getElementById('idType').value;
+            const idNumber = document.getElementById('idNumber').value;
+            const resultDiv = document.getElementById('result');
+
+            // 기본 형식 검사
+            if (!/^\d{6}-\d{7}$/.test(idNumber)) {
+                resultDiv.innerHTML = "오류: 올바른 형식이 아닙니다. (예: 000000-0000000)";
+                return;
+            }
+
+            const numbers = idNumber.replace('-', '').split('').map(Number);
+            const multipliers = [2,3,4,5,6,7,8,9,2,3,4,5];
+            let sum = 0;
+
+            // 검증 숫자 계산
+            for (let i = 0; i < 12; i++) {
+                sum += numbers[i] * multipliers[i];
+            }
+
+            const checkDigit = (11 - (sum % 11)) % 10;
+
+            if (checkDigit !== numbers[12]) {
+                resultDiv.innerHTML = "오류: 유효하지 않은 번호입니다. (검증 숫자 불일치)";
+                return;
+            }
+
+            // 주민등록번호 특정 규칙
+            if (idType === 'resident') {
+                const genderCode = numbers[6];
+                if (![1,2,3,4].includes(genderCode)) {
+                    resultDiv.innerHTML = "오류: 유효하지 않은 주민등록번호입니다. (성별 코드 오류)";
+                    return;
+                }
+            }
+
+            // 외국인등록번호 특정 규칙
+            if (idType === 'foreigner') {
+                const genderCode = numbers[6];
+                if (![5,6,7,8].includes(genderCode)) {
+                    resultDiv.innerHTML = "오류: 유효하지 않은 외국인등록번호입니다. (성별 코드 오류)";
+                    return;
+                }
+            }
+
+            resultDiv.innerHTML = "유효한 " + (idType === 'resident' ? "주민등록번호" : "외국인등록번호") + "입니다.";
+        }
+    </script>
+</body>
+</html>
